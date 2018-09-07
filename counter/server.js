@@ -1,13 +1,58 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// new code:
-var session = require('express-session');
-// original code:
-var app = express();
-// more new code:
+const session = require('express-session');
+const path = require('path');
+
+/// *************** START APP SETTING UP *************** //
+const app = express(); // create my app with express
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, './static'))); // static content
+app.set('views', path.join(__dirname, './views')); // setting up ejs and our views folder
+app.set('view engine', 'ejs');
+
+// Setup my session
 app.use(session({
-    secret: 'keyboardkitteh',
+    secret: '2pacShakur',
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: 60000 }
 }));
+// *************** FINISHED APP SETTING UP *************** //
+
+// Home route
+app.get('/', function (req, res) {
+    if (!req.session.counter) {
+        req.session.counter = 1;
+        console.log("No counter session yet so create one");
+    } else {
+        console.log("Counter session exist so increment");
+        req.session.counter++;
+    }
+    res.render('index', { 'count': req.session.counter });
+});
+
+app.get('/add_two', function (req, res) {
+    req.session.counter++;
+    res.redirect('/');
+});
+
+app.get('/reset', function (req, res) {
+    req.session.counter = 0;
+    console.log("After " + req.session.counter);
+    res.redirect('/');
+});
+
+
+
+
+
+
+
+
+
+
+
+// run server and listen on port 8000
+app.listen(8000, function () {
+    console.log("Server is running in port 8000");
+});
