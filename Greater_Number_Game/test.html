@@ -1,0 +1,28 @@
+{{ try }}
+{% if try <= 1: %} try {% else: %} tries {% endif %} </h3> {% if 'answer' in session: %} <!-- when the user answer at
+    least once -->
+    {% if answer == 'wrong': %}
+    <div class="wrong">
+        <h1>{{ hint }}</h1>
+    </div>
+
+    <form action="/check" method="POST">
+        <input type="text" name="user_number" required>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+    {% else: %}
+    <div class="right">
+        <h3>{{ guess_number }} was the number!</h3>
+        <a href="/replay">
+            <button class="btn btn-primary">Play again!</button>
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- When the user first load the page -->
+    {% else: %}
+    <form action="/check" method="POST">
+        <input type="text" name="user_number" required>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+    {% endif %}
