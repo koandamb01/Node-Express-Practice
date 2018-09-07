@@ -23,9 +23,7 @@ app.use(session({
 app.get('/', function (req, res) {
     if (!req.session.counter) {
         req.session.counter = 1;
-        console.log("No counter session yet so create one");
     } else {
-        console.log("Counter session exist so increment");
         req.session.counter++;
     }
     res.render('index', { 'count': req.session.counter });
@@ -37,8 +35,7 @@ app.get('/add_two', function (req, res) {
 });
 
 app.get('/reset', function (req, res) {
-    req.session.counter = 0;
-    console.log("After " + req.session.counter);
+    req.session.destroy();
     res.redirect('/');
 });
 
