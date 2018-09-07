@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+    <title>Trivia Game</title>
+    <style>
+        .header {
+            display: inline-block;
+            width: 22%;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid grey;
+            border-radius: 5px;
+            margin: 0.5rem;
+            background-color: #bbdefb;
+        }
+
+        .level div {
+            display: inline-block;
+            vertical-align: top;
+            width: 22%;
+            min-height: 250px;
+            padding: 10px;
+            border: 1px solid grey;
+            border-radius: 10px;
+            margin: 0.5rem;
+            background-color: #bbdefb;
+            font-size: 12px;
+        }
+
+        .level a {
+            margin-left: 5rem;
+            margin-top: 3rem;
+        }
+
+        .level h3 {
+            margin-top: 60px;
+        }
+
+        .display {
+            width: 93%;
+        }
+
+        .display * {
+            display: inline-block;
+        }
+
+        .display p {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="display">
+            <h3 id="score"><span>0 Points</span></h3>
+            <p class="right"><a class="waves-effect waves-light btn continue">Continue with new questions</a></p>
+        </div>
+        <div class="header">
+            Animations
+        </div>
+        <div class="header">
+            Books
+        </div>
+        <div class="header">
+            Computers
+        </div>
+        <div class="header">
+            Mathematics
+        </div>
+
+        <div class="level" id="level100">
+            <div class="animations">
+                <h3 class="center">100</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="books">
+                <h3 class="center">100</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="computers">
+                <h3 class="center">100</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="mathematics">
+                <h3 class="center">100</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+        </div>
+
+        <div class="level" id="level200">
+            <div class="animations">
+                <h3 class="center">200</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="books">
+                <h3 class="center">200</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="computers">
+                <h3 class="center">200</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="mathematics">
+                <h3 class="center">200</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+        </div>
+
+        <div class="level" id="level300">
+            <div class="animations">
+                <h3 class="center">300</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="books">
+                <h3 class="center">300</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="computers">
+                <h3 class="center">300</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+            <div class="mathematics">
+                <h3 class="center">300</h3>
+                <a class="waves-effect waves-light btn-small">Select</a>
+            </div>
+        </div>
+    </div>
+    <!-- Jquery Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        var correct_answer;
+        var box_choice;
+        var level_choose;
+        var score = 0;
+        var counter = 0;
+        var level100;
+        var level200;
+        var level300;
+
+        // on document.ready copy all the content on each level
+        $(document).ready(function () {
+            level100 = $('#level100').html();
+            level200 = $('#level200').html();
+            level300 = $('#level300').html();
+        })
+
+        // send an API request and diplay the response on button click
+        $(document).on('click', '.btn-small', function () {
+            $this = box_choice = $(this).parent() // record the box that was select
+
+            // display all other questions except the one clicked
+            $this.siblings().children('a').addClass('disabled');
+            $this.parent().siblings().children().children('a').addClass('disabled');
+
+            var level = level_choose = $this.children('h3').text(); // get the level that the user choose
+            var category = $this.attr('class'); // get the category that the user choose
+
+            // convert user selection to the API understanding
+            if (level == 100) {
+                level = "easy"
+            } else if (level == 200) {
+                level = "medium"
+            } else {
+                level = "hard"
+            }
+
+            if (category == "animations") {
+                category = 32
+            } else if (category == "books") {
+                category = 10
+            } else if (category == "computers") {
+                category = 18
+            } else {
+                category = 19
+            }
+
+            // Send the API request with the user selections
+            const promise = $.get("https://opentdb.com/api.php?amount=1&category=" + category + "&difficulty=" + level);
+            // once the the api get the response from the request
+
+            promise.then(showQuestions);
+            function showQuestions(data) {
+                console.log(data);
+                correct_answer = data.results[0].correct_answer; // record the correct answer for later
+                let options = []
+                options.push(data.results[0].correct_answer)
+
+                // set box hmtl to nothing
+                $this.html('<p>' + data.results[0].question + '</p>');
+
+                // get a random integer between 0 to 3 inclusive
+                randNum = Math.floor(Math.random() * data.results[0].incorrect_answers.length);
+                for (let i = 0; i < data.results[0].incorrect_answers.length; i++) {
+                    temp = data.results[0].incorrect_answers[i];
+                    $this.append(`<p>
+                                    <label>
+                                        <input type="radio" name="animations" class="user-choice" value="`+ temp + `"/>
+                                        <span>`+ temp + `</span>
+                                    </label>
+                                </p>`);
+
+                    // insert the correct answer at a random place
+                    if (randNum == i) {
+                        $this.append(`<p>
+                                    <label>
+                                        <input type="radio" name="animations" class="user-choice" value="`+ correct_answer + `"/>
+                                        <span>`+ correct_answer + `</span>
+                                    </label>
+                                </p>`);
+                    }
+                }
+
+            }
+        });
+
+        // check for user answer once the user choose an answer
+        $(document).on('click', '.user-choice', function () {
+            // record user response
+            var user_response = $(this).val();
+
+            // check the user answer now
+            if (user_response == correct_answer) {
+                // change the box background color to green
+                box_choice.addClass('green');
+
+                // update the user score
+                score += parseInt(level_choose);
+                $('#score').html("<span>" + score + " Points</span>");
+                // change the html element
+                box_choice.html("<h3 class='center'>+" + level_choose + "</h3>");
+            }
+            else {
+                // change the box background color to red
+                box_choice.addClass('red');
+                box_choice.html("<h3 class='center'>0</h3>")
+            }
+
+            // After answer the questions Enable the other questions
+            box_choice.siblings().children('a').removeClass('disabled');
+            box_choice.parent().siblings().children().children('a').removeClass('disabled');
+            counter++;
+
+            // check if all questions are answers
+            if (counter == 12) {
+                $('.display').children('p').css('display', 'block');
+            }
+        });
+
+
+        // reset all questions without reloading the page
+        $('.continue').click(function () {
+            $('#level100').html(level100);
+            $('#level200').html(level200);
+            $('#level300').html(level300);
+
+            // Now hide this button again and reset counter to zero
+            counter = 0;
+            $(this).parent().css('display', 'none');
+        });
+
+        // https://opentdb.com/api.php?amount=1&category=18&difficulty=easy -> computers
+        // https://opentdb.com/api.php?amount=1&category=10 -> books
+
+        // Books id: 10
+        // animations id: 32
+        // computers id: 18
+        // mathematics id: 19
+    </script>
+</body>
+
+</html>
