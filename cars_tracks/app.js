@@ -1,24 +1,17 @@
 const express = require('express');
 
-// create our app by invoking express
+// ********** START SETTING UP MY APP ********** //
 const app = express();
-
-// app.HTTP_VERB('URL', function (req, res) { });  // HTTP_VERB is either 'get' or 'post' etc...
-
 const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
-
-
-// tell our app to use staic files
+app.use(bodyParser.urlencoded({ extended: true })); // tell our app to use staic files
 app.use(express.static(__dirname + "/static"));
 app.use(express.static(__dirname + "/static/templates"));
 app.use(express.static(__dirname + "/static/css"));
 app.use(express.static(__dirname + "/static/images"));
+app.set('views', __dirname + '/views'); // tell our express app to use views
+app.set('view engine', 'ejs'); // Now lets set the view engine itself so that express knows that we are using ejs as opposed to another templating engine like jade
+// *************** FINISHED APP SETTING UP *************** //
 
-// tell our express app to use views
-app.set('views', __dirname + '/views');
-// Now lets set the view engine itself so that express knows that we are using ejs as opposed to another templating engine like jade
-app.set('view engine', 'ejs');
 
 // app.get('/', function (req, res) { });
 
@@ -59,13 +52,6 @@ app.get('/cat3', function (req, res) {
 app.post('/add_car', function (req, res) {
     console.log("My POST DATA: \n\n", req.body);
     res.redirect('/cars/new');
-});
-
-app.get("/users/:id", function (req, res) {
-    console.log("The user id requested is:", req.params.id);
-    // just to illustrate that req.params is usable here:
-    res.send("You requested the user with id: " + req.params.id);
-    // code to get user from db goes here, etc...
 });
 
 
